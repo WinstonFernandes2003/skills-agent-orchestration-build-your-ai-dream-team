@@ -1,0 +1,44 @@
+{
+  "projects": [
+    {
+      "name": "Contributor Onboarding",
+      "owner": "Mona Patel",
+      "status": "Active",
+      "recentActivity": "Published the refreshed first-contribution checklist.",
+      "priority": "High",
+      "summary": "Make the path from first visit to first contribution easier to follow."
+    },
+    {
+      "name": "Docs Search Refresh",
+      "owner": "Jordan Lee",
+      "status": "Planning",
+      "recentActivity": "Compared search analytics and drafted the new information architecture.",
+      "priority": "Medium",
+      "summary": "Help contributors find the right guide without guessing the terminology."
+    },
+    {
+      "name": "Release Notes Pipeline",
+      "owner": "Sam Rivera",
+      "status": "Blocked",
+      "recentActivity": "Waiting on the repository event permissions for the automation proof of concept.",
+      "priority": "High",
+      "summary": "Turn merged changes into consistent, reviewable release notes."
+    },
+    {
+      "name": "Accessibility Review",
+      "owner": "Avery Chen",
+      "status": "Active",
+      "recentActivity": "Completed keyboard navigation checks for the project templates.",
+      "priority": "Medium",
+      "summary": "Build accessibility checks into the team workflow before launch."
+    },
+    {
+      "name": "Archive Cleanup",
+      "owner": "Taylor Brooks",
+      "status": "Complete",
+      "recentActivity": "Archived 34 stale examples and linked the remaining references.",
+      "priority": "Low",
+      "summary": "Keep the shared workspace focused, current, and easy to navigate."
+    }
+  ]
+}

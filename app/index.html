@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A contributor-friendly overview of current team projects.">
+    <title>Project Pulse</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="project-data.json" type="application/json"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#projects">Skip to projects</a>
+
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="Project Pulse home">Project Pulse</a>
+      <span class="section-label">Contributor workspace</span>
+    </header>
+
+    <main>
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">Team overview</p>
+          <h1>See what is moving.</h1>
+          <p>Track ownership, momentum, and the next important signal across the team&apos;s projects.</p>
+        </div>
+        <div class="header-stat" aria-label="Project count">
+          <strong id="project-count">&mdash;</strong>
+          <span>Projects tracked</span>
+        </div>
+      </header>
+
+      <section class="dashboard" id="projects" aria-labelledby="projects-heading">
+        <div class="dashboard-heading">
+          <div>
+            <p class="eyebrow">Current work</p>
+            <h2 id="projects-heading">Project signals</h2>
+          </div>
+          <p id="dashboard-status" role="status" aria-live="polite">Loading projects...</p>
+        </div>
+        <div id="project-list" class="dashboard" aria-live="polite" aria-busy="true"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>Project Pulse keeps the team aligned with a quick, human-readable snapshot.</p>
+    </footer>
+
+    <script>
+      (() => {
+        const projectList = document.querySelector('#project-list');
+        const projectCount = document.querySelector('#project-count');
+        const dashboardStatus = document.querySelector('#dashboard-status');
+
+        const setMessage = (className, message) => {
+          projectList.replaceChildren();
+          const messageElement = document.createElement('p');
+          messageElement.className = className;
+          messageElement.textContent = message;
+          projectList.append(messageElement);
+          projectList.setAttribute('aria-busy', 'false');
+          dashboardStatus.textContent = message;
+        };
+
+        const createMetaItem = (label, value, valueClass = 'project-meta-value') => {
+          const item = document.createElement('div');
+          item.className = 'project-meta-item';
+
+          const labelElement = document.createElement('dt');
+          labelElement.className = 'project-meta-label';
+          labelElement.textContent = label;
+
+          const valueElement = document.createElement('dd');
+          valueElement.className = valueClass;
+          valueElement.textContent = value;
+
+          item.append(labelElement, valueElement);
+          return item;
+        };
+
+        const createProjectCard = (project) => {
+          const card = document.createElement('article');
+          card.className = 'project-card';
+
+          const cardHeader = document.createElement('div');
+          cardHeader.className = 'project-card__header';
+
+          const title = document.createElement('h3');
+          title.textContent = project.name;
+
+          const status = document.createElement('span');
+          status.className = 'status status-badge';
+          status.dataset.status = project.status.toLowerCase();
+          status.textContent = project.status;
+          status.setAttribute('aria-label', `Status: ${project.status}`);
+
+          cardHeader.append(title, status);
+
+          const activity = document.createElement('p');
+          activity.className = 'recent-activity';
+          activity.textContent = project.recentActivity;
+
+          const summary = document.createElement('p');
+          summary.className = 'project-summary';
+          summary.textContent = project.summary || 'No project summary is available.';
+
+          const metadata = document.createElement('dl');
+          metadata.className = 'project-meta';
+          metadata.append(
+            createMetaItem('Owner', project.owner),
+            createMetaItem('Priority', project.priority, `priority priority-badge ${project.priority.toLowerCase()}`)
+          );
+
+          card.append(cardHeader, summary, activity, metadata);
+          return card;
+        };
+
+        const renderProjects = (data) => {
+          if (!data || !Array.isArray(data.projects)) {
+            throw new Error('Project data must contain a projects array.');
+          }
+
+          const projects = data.projects.filter((project) => (
+            project && ['name', 'owner', 'status', 'recentActivity', 'priority'].every(
+              (field) => typeof project[field] === 'string' && project[field].trim()
+            )
+          ));
+
+          if (projects.length === 0) {
+            projectCount.textContent = '0';
+            setMessage('dashboard-empty', 'No projects are available right now.');
+            return;
+          }
+
+          projectCount.textContent = projects.length;
+          projectList.replaceChildren(...projects.map(createProjectCard));
+          projectList.setAttribute('aria-busy', 'false');
+          dashboardStatus.textContent = `${projects.length} projects loaded.`;
+        };
+
+        fetch('project-data.json')
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`Project data request failed with status ${response.status}.`);
+            }
+            return response.json();
+          })
+          .then(renderProjects)
+          .catch(() => {
+            projectCount.textContent = '?';
+            setMessage('dashboard-error', 'Project data could not be loaded. Please try again later.');
+          });
+      })();
+    </script>
+  </body>
+</html>
